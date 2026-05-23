@@ -73,3 +73,19 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Template Specific
+*.code-workspace
+.vscode/*
+!.vscode/tasks.json
+*.ignore
+*.zip
+/Plugins/
+!/Plugins/VisualStudioTools/
+/GameBuild/
+codeDL.ps1
+
+# Clean Contents
+/Content/StarterContent/
+/Content/Characters/
+/Content/LevelPrototyping/

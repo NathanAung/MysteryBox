@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Windows Build",
+            "command": "${workspaceFolder}/Tools/UEBuild.bat",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+		{
+            "label": "Run Game",
+            "type": "shell",
+            "command": "${workspaceFolder}/Tools/UERunGame.bat",
+			"isBackground": false,
+            "problemMatcher": []
+        }
+    ]
+}
