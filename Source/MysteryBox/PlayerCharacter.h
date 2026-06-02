@@ -10,6 +10,8 @@
 class UInputMappingContext;
 class UInputAction;
 
+enum class EBoxColor : uint8;
+
 UCLASS()
 class MYSTERYBOX_API APlayerCharacter : public ACharacter
 {
@@ -58,4 +60,5 @@ private:
 	void ResetSpeed();
 	void ResetStun();
 
+	void ProcessMysteryBox(EBoxColor BoxColor);
 };

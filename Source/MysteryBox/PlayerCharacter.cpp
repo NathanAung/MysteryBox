@@ -108,16 +108,16 @@ void APlayerCharacter::Interact()
 
 	if (bHit)
 	{
-		// 1. Attempt to cast the hit actor to a Mystery Box
+		// Attempt to cast the hit actor to a Mystery Box
 		AMysteryBoxActor* HitBox = Cast<AMysteryBoxActor>(HitResult.GetActor());
 
 		if (HitBox)
 		{
-			// 2. We hit a box. Call its OpenBox function.
+			// We hit a box. Call its OpenBox function.
 			// This triggers the box's cooldown and returns the color it currently is.
 			EBoxColor OpenedColor = HitBox->OpenBox();
 
-			// 3. Print the result to the screen (debug)
+			// Print the result to the screen (debug)
 			if (GEngine)
 			{
 				// Convert the Enum to a readable string
@@ -129,7 +129,92 @@ void APlayerCharacter::Interact()
 				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, FString::Printf(TEXT("Player opened a %s box!"), *ColorString));
 			}
 
-			// rng logic will be here
+			// Process the box's effect on the player based on the color
+			ProcessMysteryBox(OpenedColor);
+		}
+	}
+}
+
+
+void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
+{
+	// ROLL FOR THE PRESENT COLOR
+	int32 BoxRoll = FMath::RandRange(1, 100);
+	FString PresentColor = "";
+
+	if (BoxColor == EBoxColor::Green)
+	{
+		if (BoxRoll <= 70) PresentColor = "Green";
+		else if (BoxRoll <= 90) PresentColor = "Yellow";
+		else PresentColor = "Red";
+	}
+	else if (BoxColor == EBoxColor::Yellow)
+	{
+		if (BoxRoll <= 10) PresentColor = "Green";
+		else if (BoxRoll <= 90) PresentColor = "Yellow";
+		else PresentColor = "Red";
+	}
+	else if (BoxColor == EBoxColor::Red)
+	{
+		if (BoxRoll <= 10) PresentColor = "Green";
+		else if (BoxRoll <= 30) PresentColor = "Yellow";
+		else PresentColor = "Red";
+	}
+
+	// RESOLVE YELLOW PRESENTS (50/50 split into Green or Red)
+	if (PresentColor == "Yellow")
+	{
+		int32 YellowRoll = FMath::RandRange(1, 100);
+		PresentColor = (YellowRoll <= 50) ? "Green" : "Red";
+
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Got a Yellow Present! Flipping coin..."));
+	}
+
+	// ROLL FOR THE FINAL EFFECT
+	int32 EffectRoll = FMath::RandRange(1, 100);
+
+	if (PresentColor == "Green")
+	{
+		// GREEN PRESENT EFFECTS
+		if (EffectRoll <= 20)
+		{
+			// 20% Chance: Fragment
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Found a Fragment!"));
+			// FragmentCount++; (will implement GameMode tracking later)
+		}
+		else if (EffectRoll <= 60)
+		{
+			// 40% Chance: Speed Up 3s
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Speed Up for 3 Seconds!"));
+			ApplySpeedModifier(1.5f, 3.0f); // Example: 50% faster
+		}
+		else
+		{
+			// 40% Chance: Enemy Stun 2s
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Stunned the Enemy for 2 Seconds!"));
+			// will tell the GameMode to stun the other player later
+		}
+	}
+	else
+	{
+		// RED PRESENT EFFECTS
+		if (EffectRoll <= 20)
+		{
+			// 20% Chance: Enemy gets a Fragment
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Enemy got a Fragment!"));
+			// will tell the GameMode to give the enemy a fragment later
+		}
+		else if (EffectRoll <= 60)
+		{
+			// 40% Chance: Speed Down 3s
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Speed Down for 3 Seconds!"));
+			ApplySpeedModifier(0.5f, 3.0f); // Example: 50% slower
+		}
+		else
+		{
+			// 40% Chance: Self Stun 2s
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Self Stun for 2 Seconds!"));
+			ApplyStun(2.0f);
 		}
 	}
 }

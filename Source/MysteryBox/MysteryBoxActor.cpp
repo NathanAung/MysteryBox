@@ -29,6 +29,7 @@ void AMysteryBoxActor::BeginPlay()
 	Super::BeginPlay();
 
 	// Start the initial color cycle loop
+	CurrentColor = static_cast<EBoxColor>(FMath::RandRange(0, 2));
 	GetWorldTimerManager().SetTimer(ColorCycleTimerHandle, this, &AMysteryBoxActor::CycleColor, ColorCycleRate, true);
 	UpdateMaterial();
 }
@@ -38,19 +39,14 @@ void AMysteryBoxActor::CycleColor()
 {
 	if (bIsOnCooldown) return;
 
-	// Shift the color to the next state
-	switch (CurrentColor)
+	// randomly select a new color that's different from the current one
+	EBoxColor OldColor = CurrentColor;
+
+	// Keep rolling a random color until it is different from the current one
+	do
 	{
-	case EBoxColor::Green:
-		CurrentColor = EBoxColor::Yellow;
-		break;
-	case EBoxColor::Yellow:
-		CurrentColor = EBoxColor::Red;
-		break;
-	case EBoxColor::Red:
-		CurrentColor = EBoxColor::Green;
-		break;
-	}
+		CurrentColor = static_cast<EBoxColor>(FMath::RandRange(0, 2));
+	} while (CurrentColor == OldColor);
 
 	UpdateMaterial();
 }
