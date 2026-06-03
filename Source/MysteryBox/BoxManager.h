@@ -42,7 +42,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid State")
 	TArray<AMysteryBoxActor*> SpawnedBoxes;
 
-	// --- Functions ---
 	void GenerateGrid();
 
 };

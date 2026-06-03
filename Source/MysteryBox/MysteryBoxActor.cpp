@@ -107,3 +107,16 @@ void AMysteryBoxActor::ResetCooldown()
 	UpdateMaterial();
 }
 
+
+void AMysteryBoxActor::ForceDeactivate()
+{
+	bIsOnCooldown = true;
+
+	// Kill all active timers so it never changes color or wakes up again
+	GetWorldTimerManager().ClearTimer(ColorCycleTimerHandle);
+	GetWorldTimerManager().ClearTimer(CooldownTimerHandle);
+
+	// Force it to the gray/cooldown material
+	UpdateMaterial();
+}
+

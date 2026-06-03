@@ -6,9 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "MysteryBoxGameMode.generated.h"
 
-/**
- * 
- */
+class APlayerCharacter;
+
 UCLASS()
 class MYSTERYBOX_API AMysteryBoxGameMode : public AGameModeBase
 {
@@ -24,4 +23,14 @@ protected:
 private:
 	// keeps track of how many spawns we've handed out
 	int32 PlayersSpawnedCount = 0;
+
+public:
+	// Adds a fragment and checks if this player just won the game
+	void AddFragmentToPlayer(APlayerCharacter* InstigatorPlayer, bool bAddToEnemy);
+
+	// Finds the other player and applies an effect
+	void StunEnemy(APlayerCharacter* InstigatorPlayer, float Duration);
+	void ModifyEnemySpeed(APlayerCharacter* InstigatorPlayer, float Multiplier, float Duration);
+
+	bool bGameOver = false;
 };

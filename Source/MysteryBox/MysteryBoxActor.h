@@ -69,4 +69,7 @@ public:
 
 	// Returns the color it was when opened. Called by the Player Character.
 	EBoxColor OpenBox();
+
+	// Permanently locks the box at the end of the game
+	void ForceDeactivate();
 };

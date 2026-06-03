@@ -3,12 +3,15 @@
 
 #include "PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "MysteryBoxActor.h"
+#include "MysteryBoxGameMode.h"
+
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -173,26 +176,29 @@ void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
 	// ROLL FOR THE FINAL EFFECT
 	int32 EffectRoll = FMath::RandRange(1, 100);
 
+	// Get a reference to our GameMode
+	AMysteryBoxGameMode* GM = Cast<AMysteryBoxGameMode>(GetWorld()->GetAuthGameMode());
+
 	if (PresentColor == "Green")
 	{
 		// GREEN PRESENT EFFECTS
 		if (EffectRoll <= 20)
 		{
 			// 20% Chance: Fragment
+			if (GM) GM->AddFragmentToPlayer(this, false);
 			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Found a Fragment!"));
-			// FragmentCount++; (will implement GameMode tracking later)
 		}
 		else if (EffectRoll <= 60)
 		{
-			// 40% Chance: Speed Up 3s
+			// 40% Chance: Speed Up
+			ApplySpeedModifier(1.5f, 3.0f); // 50% faster, 3 seconds
 			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Speed Up for 3 Seconds!"));
-			ApplySpeedModifier(1.5f, 3.0f); // Example: 50% faster
 		}
 		else
 		{
-			// 40% Chance: Enemy Stun 2s
+			// 40% Chance: Enemy Stun
+			if (GM) GM->StunEnemy(this, 2.0f);
 			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Stunned the Enemy for 2 Seconds!"));
-			// will tell the GameMode to stun the other player later
 		}
 	}
 	else
@@ -201,48 +207,76 @@ void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
 		if (EffectRoll <= 20)
 		{
 			// 20% Chance: Enemy gets a Fragment
+			if (GM) GM->AddFragmentToPlayer(this, true);
 			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Enemy got a Fragment!"));
-			// will tell the GameMode to give the enemy a fragment later
 		}
 		else if (EffectRoll <= 60)
 		{
-			// 40% Chance: Speed Down 3s
+			// 40% Chance: Speed Down
+			ApplySpeedModifier(0.5f, 3.0f); // 50% slower, 3 seconds
 			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Speed Down for 3 Seconds!"));
-			ApplySpeedModifier(0.5f, 3.0f); // Example: 50% slower
 		}
 		else
 		{
-			// 40% Chance: Self Stun 2s
-			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Self Stun for 2 Seconds!"));
+			// 40% Chance: Self Stun
 			ApplyStun(2.0f);
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Self Stun for 2 Seconds!"));
 		}
 	}
 }
 
 
-// Status Effects
+// STATUS EFFECTS
 void APlayerCharacter::ApplySpeedModifier(float Multiplier, float Duration)
 {
-	// Placeholder for applying speed buff/debuff
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("ApplySpeedModifier Triggered"));
+	// Change the speed
+	GetCharacterMovement()->MaxWalkSpeed = BaseSpeed * Multiplier;
+
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, Duration, FColor::Cyan, FString::Printf(TEXT("Speed changed to %f"), GetCharacterMovement()->MaxWalkSpeed));
+
+	// Clear any existing timer so a new buff overwrites an old one safely
+	GetWorldTimerManager().ClearTimer(SpeedTimerHandle);
+
+	// Start the timer to reset the speed
+	GetWorldTimerManager().SetTimer(SpeedTimerHandle, this, &APlayerCharacter::ResetSpeed, Duration, false);
 }
 
 
 void APlayerCharacter::ResetSpeed()
 {
-	// Placeholder for resetting speed
+	GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("Speed Returned to Normal"));
 }
 
 
 void APlayerCharacter::ApplyStun(float Duration)
 {
-	// Placeholder for applying stun
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("ApplyStun Triggered"));
+	// This completely disables the Move() and Interact() functions
+	bIsStunned = true;
+
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, Duration, FColor::Red, TEXT("Stun Triggered"));
+
+	// Safely manage the timer
+	GetWorldTimerManager().ClearTimer(StunTimerHandle);
+	GetWorldTimerManager().SetTimer(StunTimerHandle, this, &APlayerCharacter::ResetStun, Duration, false);
 }
 
 
 void APlayerCharacter::ResetStun()
 {
-	// Placeholder for removing stun
+	bIsStunned = false;
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Stun Ended"));
 }
 
+
+void APlayerCharacter::DisablePlayer()
+{
+	bIsStunned = true;
+
+	// Clear timers so a previously running buff/debuff doesn't accidentally reset the stun
+	GetWorldTimerManager().ClearTimer(SpeedTimerHandle);
+	GetWorldTimerManager().ClearTimer(StunTimerHandle);
+
+	// Force their speed to zero just to be completely safe
+	GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+}

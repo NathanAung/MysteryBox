@@ -13,12 +13,14 @@ ABoxManager::ABoxManager()
 	SpacingY = 250.0f;
 }
 
+
 void ABoxManager::BeginPlay()
 {
 	Super::BeginPlay();
 
 	GenerateGrid();
 }
+
 
 void ABoxManager::GenerateGrid()
 {
