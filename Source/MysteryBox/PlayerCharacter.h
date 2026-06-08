@@ -10,6 +10,8 @@
 class UInputMappingContext;
 class UInputAction;
 
+enum class EBoxColor : uint8;
+
 UCLASS()
 class MYSTERYBOX_API APlayerCharacter : public ACharacter
 {
@@ -20,6 +22,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void PawnClientRestart() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// Input
@@ -33,7 +36,7 @@ protected:
 	UInputAction* InteractAction;
 
 	void Move(const FInputActionValue& Value);
-	void Interact(); // Placeholder
+	void Interact();
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Game Status")
@@ -45,9 +48,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Game Status")
 	float BaseSpeed;
 
-	// Placeholder functions
+	// Effects applied by boxes
 	void ApplySpeedModifier(float Multiplier, float Duration);
 	void ApplyStun(float Duration);
+
+	// Permanently disables the player at the end of the game
+	void DisablePlayer();
 
 private:
 	// Timer Handles for resetting effects
@@ -57,4 +63,5 @@ private:
 	void ResetSpeed();
 	void ResetStun();
 
+	void ProcessMysteryBox(EBoxColor BoxColor);
 };
