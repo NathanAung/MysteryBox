@@ -13,6 +13,11 @@ void AMysteryBoxGameMode::BeginPlay()
 
 	// Spawn Player 2
 	UGameplayStatics::CreatePlayer(GetWorld(), 1, true);
+
+	// Setup UIController
+	UIController = GetWorld()->SpawnActor<AUIController>();
+	if(!UIController)
+		UE_LOG(LogTemp, Error, TEXT("Couldn't spawn UIController..."));
 }
 
 
@@ -72,24 +77,25 @@ void AMysteryBoxGameMode::AddFragmentToPlayer(APlayerCharacter* InstigatorPlayer
 	// Reward whoever the target ended up being
 	if (TargetPlayer)
 	{
-		TargetPlayer->FragmentCount++;
+		// Determine player number based on their Controller ID (0 = Player 1, 1 = Player 2)
+		int32 PlayerNum = 1;
+		if (APlayerController* PC = Cast<APlayerController>(TargetPlayer->GetController()))
+		{
+			PlayerNum = UGameplayStatics::GetPlayerControllerID(PC) + 1;
+		}
 
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Player has %d / 3 Fragments"), TargetPlayer->FragmentCount));
+		TargetPlayer->FragmentCount++;
+		UIController->UpdatePlayerScore(PlayerNum);
+		// if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Player has %d / 3 Fragments"), TargetPlayer->FragmentCount));
 
 		// GAME OVER LOGIC
 		if (TargetPlayer->FragmentCount >= 3)
 		{	
 			bGameOver = true;
 
-			// Determine who won based on their Controller ID (0 = Player 1, 1 = Player 2)
-			int32 WinningPlayerNum = 1;
-			if (APlayerController* PC = Cast<APlayerController>(TargetPlayer->GetController()))
-			{
-				WinningPlayerNum = UGameplayStatics::GetPlayerControllerID(PC) + 1;
-			}
-
 			// Print the Winner
-			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Orange, FString::Printf(TEXT("PLAYER %d WINS"), WinningPlayerNum));
+			UIController->CallWinScreen(PlayerNum);
+			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Orange, FString::Printf(TEXT("PLAYER %d WINS"), PlayerNum));
 
 			// Disable all Players
 			TArray<AActor*> AllPlayers;
