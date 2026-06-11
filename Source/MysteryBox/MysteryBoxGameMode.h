@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+
+#include "UIController.h"
+
 #include "MysteryBoxGameMode.generated.h"
 
 class APlayerCharacter;
@@ -23,6 +26,8 @@ protected:
 private:
 	// keeps track of how many spawns we've handed out
 	int32 PlayersSpawnedCount = 0;
+
+	AUIController* UIController;
 
 public:
 	// Adds a fragment and checks if this player just won the game
