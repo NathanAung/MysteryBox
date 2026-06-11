@@ -25,6 +25,6 @@ pushd "%~dp0.."
 for %%a in (%projExt%) do set projName=%%a
 popd
 
-call %compiler% %projName:~0,-9%Editor Win64 Development "%~dp0..\%projName%" -waitmutex -NoHotReload -NoDebugInfo
+call %compiler% %projName:~0,-9%Editor Win64 Development "%~dp0..\%projName%" -waitmutex
 
 pause
