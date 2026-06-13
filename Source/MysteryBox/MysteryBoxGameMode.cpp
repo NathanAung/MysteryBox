@@ -12,7 +12,13 @@ void AMysteryBoxGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	// Spawn Player 2
-	UGameplayStatics::CreatePlayer(GetWorld(), 1, true);
+	APlayerController* P2Controller = UGameplayStatics::CreatePlayer(GetWorld(), 1, true);
+
+	if (P2Controller && Player2Mat) {
+		if (APlayerCharacter* P2Character = Cast<APlayerCharacter>(P2Controller->GetPawn())) {
+			P2Character->SetModelMaterial(Player2Mat);
+		}
+	}
 
 	// Setup UIController
 	UIController = GetWorld()->SpawnActor<AUIController>();

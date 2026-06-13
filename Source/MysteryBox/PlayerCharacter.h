@@ -55,6 +55,9 @@ public:
 	// Permanently disables the player at the end of the game
 	void DisablePlayer();
 
+	// Finds the custom "Model" component and changes its material
+	void SetModelMaterial(class UMaterialInterface* NewMaterial);
+
 private:
 	// Timer Handles for resetting effects
 	FTimerHandle SpeedTimerHandle;

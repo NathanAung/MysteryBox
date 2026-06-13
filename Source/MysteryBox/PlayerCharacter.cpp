@@ -4,6 +4,7 @@
 #include "PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/MeshComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
@@ -279,4 +280,26 @@ void APlayerCharacter::DisablePlayer()
 
 	// Force their speed to zero just to be completely safe
 	GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+}
+
+
+void APlayerCharacter::SetModelMaterial(UMaterialInterface* NewMaterial)
+{
+	if (!NewMaterial) return;
+
+	// Get every mesh component attached to this character
+	TArray<UMeshComponent*> AllMeshes;
+	GetComponents<UMeshComponent>(AllMeshes);
+
+	// Loop through them to find the one explicitly named "Model"
+	for (UMeshComponent* MeshComp : AllMeshes)
+	{
+		if (MeshComp->GetName() == TEXT("boxmover"))
+		{
+			MeshComp->SetMaterial(0, NewMaterial);
+			return; // We found it and painted it, so we can stop searching
+		}
+	}
+
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Could not find a component named 'boxmover'"));
 }
