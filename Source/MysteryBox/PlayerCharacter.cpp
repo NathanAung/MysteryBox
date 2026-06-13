@@ -58,7 +58,17 @@ void APlayerCharacter::PawnClientRestart()
 		{
 			// Clear existing mappings just in case it runs twice, then add it
 			Subsystem->ClearAllMappings();
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+
+			// Determine which player this is
+			int32 PlayerIndex = UGameplayStatics::GetPlayerControllerID(PlayerController);
+
+			// Assign the correct mapping context
+			UInputMappingContext* ContextToUse = (PlayerIndex == 0) ? MappingContext_P1 : MappingContext_P2;
+
+			if (ContextToUse)
+			{
+				Subsystem->AddMappingContext(ContextToUse, 0);
+			}
 		}
 	}
 }
