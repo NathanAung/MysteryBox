@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "imgui.h"
 #include "TitleController.generated.h"
 
 UCLASS()
@@ -25,6 +26,8 @@ public:
 
 private:
 	APlayerController* PC;
+
+	ImFont* CustomFont;
 
 	void ShowTitleMenu();
 

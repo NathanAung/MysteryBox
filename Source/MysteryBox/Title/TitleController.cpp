@@ -3,8 +3,8 @@
 #include "TitleController.h"
 #include "Kismet/GameplayStatics.h"
 #include "string"
-#include "imgui.h"
 #include "ImGuiModule.h"
+#include "../Fonts/FONT_Tron.h"
 
 // Sets default values
 ATitleController::ATitleController()
@@ -19,12 +19,31 @@ void ATitleController::BeginPlay()
 	Super::BeginPlay();
 
 	PC = GetWorld()->GetFirstPlayerController();
-
 	ImGuiIO &io = ImGui::GetIO();
-	io.WantCaptureKeyboard = true;
-	io.WantCaptureMouse = true;
+
+	if (io.Fonts->Fonts.Size == 1)
+	{
+		if (TSharedPtr<ImFontConfig> FAFontConfig = MakeShareable(new ImFontConfig()))
+		{
+
+			FAFontConfig->FontDataOwnedByAtlas = false;		 // Global font data lifetime
+			FAFontConfig->FontData = (void *)FONT_Tron_data; // Declared in binary C .h file
+			FAFontConfig->FontDataSize = FONT_Tron_size;	 // Declared in binary C .h file
+			FAFontConfig->SizePixels = 18;
+			FAFontConfig->MergeMode = false;	   // Forces ImGui to place this font into the same atlas as the previous font
+			FAFontConfig->GlyphMinAdvanceX = 18.f; // Use for monospaced icons
+			FAFontConfig->PixelSnapH = true;	   // Better rendering (align to pixel grid)
+
+			FImGuiModule::Get().GetProperties().AddCustomFont("TRON", FAFontConfig);
+			FImGuiModule::Get().RebuildFontAtlas();
+		}
+	}
 
 	FImGuiModule::Get().SetInputMode(true);
+
+	UE_LOG(LogTemp, Warning, TEXT("Fonts: %d"), io.Fonts->Fonts.Size);
+
+	CustomFont = io.Fonts->Fonts.back();
 }
 
 // Called every frame
@@ -64,6 +83,8 @@ void ATitleController::ShowTitleMenu()
 	// Darker tone when clicked
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.05f, 0.25f, 1.0f));
 
+	ImGui::PushFont(CustomFont);
+
 	// Padding and rounding to make buttons look modern and sleek
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 15.0f)); // Elegant spacing between elements
@@ -92,6 +113,7 @@ void ATitleController::ShowTitleMenu()
 	ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
 	if (ImGui::Button("START GAME", ImVec2(buttonWidth, buttonHeight)))
 	{
+		FImGuiModule::Get().SetInputMode(false);
 		UGameplayStatics::OpenLevel(GetWorld(), "FirstLevel");
 	}
 
@@ -113,6 +135,7 @@ void ATitleController::ShowTitleMenu()
 	ImGui::End();
 
 	// Clean up styles
+	ImGui::PopFont();
 	ImGui::PopStyleVar(2);
 	ImGui::PopStyleColor(4);
 }
