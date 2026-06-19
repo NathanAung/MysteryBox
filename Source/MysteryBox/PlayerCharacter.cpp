@@ -131,6 +131,12 @@ void APlayerCharacter::Interact()
 			// This triggers the box's cooldown and returns the color it currently is.
 			EBoxColor OpenedColor = HitBox->OpenBox();
 
+			// Play the box opening sound for feedback
+			if (BoxOpenSound)
+			{
+    			UGameplayStatics::PlaySound2D(this, BoxOpenSound);
+			}
+
 			// Print the result to the screen (debug)
 			if (GEngine)
 			{
@@ -140,7 +146,7 @@ void APlayerCharacter::Interact()
 				// Optional: Strip out the "EBoxColor::" prefix for a cleaner debug message
 				ColorString.Split(TEXT("::"), nullptr, &ColorString);
 
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, FString::Printf(TEXT("Player opened a %s box!"), *ColorString));
+				//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, FString::Printf(TEXT("Player opened a %s box!"), *ColorString));
 			}
 
 			// Process the box's effect on the player based on the color
@@ -181,7 +187,7 @@ void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
 		int32 YellowRoll = FMath::RandRange(1, 100);
 		PresentColor = (YellowRoll <= 50) ? "Green" : "Red";
 
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Got a Yellow Present! Flipping coin..."));
+		//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Got a Yellow Present! Flipping coin..."));
 	}
 
 	// ROLL FOR THE FINAL EFFECT
@@ -197,19 +203,22 @@ void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
 		{
 			// 20% Chance: Fragment
 			if (GM) GM->AddFragmentToPlayer(this, false);
-			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Found a Fragment!"));
+			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Found a Fragment!"));
+			PlayDelayedSound(FragmentSound);
 		}
 		else if (EffectRoll <= 60)
 		{
 			// 40% Chance: Speed Up
 			ApplySpeedModifier(1.5f, 3.0f); // 50% faster, 3 seconds
-			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Speed Up for 3 Seconds!"));
+			PlayDelayedSound(SpeedUpSound);
+			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Speed Up for 3 Seconds!"));
 		}
 		else
 		{
 			// 40% Chance: Enemy Stun
 			if (GM) GM->StunEnemy(this, 2.0f);
-			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Stunned the Enemy for 2 Seconds!"));
+			PlayDelayedSound(StunSound);
+			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Stunned the Enemy for 2 Seconds!"));
 		}
 	}
 	else
@@ -219,19 +228,22 @@ void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
 		{
 			// 20% Chance: Enemy gets a Fragment
 			if (GM) GM->AddFragmentToPlayer(this, true);
-			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Enemy got a Fragment!"));
+			PlayDelayedSound(EnemyFragmentSound);
+			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Enemy got a Fragment!"));
 		}
 		else if (EffectRoll <= 60)
 		{
 			// 40% Chance: Speed Down
 			ApplySpeedModifier(0.5f, 3.0f); // 50% slower, 3 seconds
-			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Speed Down for 3 Seconds!"));
+			PlayDelayedSound(SpeedDownSound);
+			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Speed Down for 3 Seconds!"));
 		}
 		else
 		{
 			// 40% Chance: Self Stun
 			ApplyStun(2.0f);
-			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Self Stun for 2 Seconds!"));
+			PlayDelayedSound(StunSound);
+			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Self Stun for 2 Seconds!"));
 		}
 	}
 }
@@ -243,7 +255,7 @@ void APlayerCharacter::ApplySpeedModifier(float Multiplier, float Duration)
 	// Change the speed
 	GetCharacterMovement()->MaxWalkSpeed = BaseSpeed * Multiplier;
 
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, Duration, FColor::Cyan, FString::Printf(TEXT("Speed changed to %f"), GetCharacterMovement()->MaxWalkSpeed));
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, Duration, FColor::Cyan, FString::Printf(TEXT("Speed changed to %f"), GetCharacterMovement()->MaxWalkSpeed));
 
 	// Clear any existing timer so a new buff overwrites an old one safely
 	GetWorldTimerManager().ClearTimer(SpeedTimerHandle);
@@ -256,7 +268,7 @@ void APlayerCharacter::ApplySpeedModifier(float Multiplier, float Duration)
 void APlayerCharacter::ResetSpeed()
 {
 	GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("Speed Returned to Normal"));
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("Speed Returned to Normal"));
 }
 
 
@@ -265,7 +277,7 @@ void APlayerCharacter::ApplyStun(float Duration)
 	// This completely disables the Move() and Interact() functions
 	bIsStunned = true;
 
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, Duration, FColor::Red, TEXT("Stun Triggered"));
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, Duration, FColor::Red, TEXT("Stun Triggered"));
 
 	// Safely manage the timer
 	GetWorldTimerManager().ClearTimer(StunTimerHandle);
@@ -276,7 +288,7 @@ void APlayerCharacter::ApplyStun(float Duration)
 void APlayerCharacter::ResetStun()
 {
 	bIsStunned = false;
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Stun Ended"));
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Stun Ended"));
 }
 
 
@@ -311,5 +323,23 @@ void APlayerCharacter::SetModelMaterial(UMaterialInterface* NewMaterial)
 		}
 	}
 
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Could not find a component named 'boxmover'"));
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Could not find a component named 'boxmover'"));
+}
+
+
+void APlayerCharacter::PlayDelayedSound(USoundBase* Sound)
+{
+    if (!Sound) return;
+
+    FTimerHandle TempHandle;
+
+    GetWorldTimerManager().SetTimer(
+        TempHandle,
+        [this, Sound]()
+        {
+            UGameplayStatics::PlaySound2D(this, Sound);
+        },
+        EffectSoundDelay,
+        false
+    );
 }

@@ -41,6 +41,7 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Interact();
 
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Game Status")
 	int32 FragmentCount;
@@ -61,6 +62,27 @@ public:
 	// Finds the custom "Model" component and changes its material
 	void SetModelMaterial(class UMaterialInterface* NewMaterial);
 
+	UPROPERTY(EditAnywhere, Category="Audio")
+	USoundBase* BoxOpenSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
+	USoundBase* FragmentSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
+	USoundBase* EnemyFragmentSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
+	USoundBase* SpeedUpSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
+	USoundBase* SpeedDownSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
+	USoundBase* StunSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
+	float EffectSoundDelay = 0.4f;
+
 private:
 	// Timer Handles for resetting effects
 	FTimerHandle SpeedTimerHandle;
@@ -70,4 +92,6 @@ private:
 	void ResetStun();
 
 	void ProcessMysteryBox(EBoxColor BoxColor);
+
+	void PlayDelayedSound(USoundBase* Sound);
 };
