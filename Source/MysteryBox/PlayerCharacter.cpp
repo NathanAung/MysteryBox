@@ -276,8 +276,7 @@ void APlayerCharacter::ApplyStun(float Duration)
 {
 	// This completely disables the Move() and Interact() functions
 	bIsStunned = true;
-	//CurrentPlayerMaterial = GetMesh()->GetMaterial(0);
-	//SetModelMaterial(StunnedMaterial);
+
 	ApplyVisualMaterial(StunnedMaterial);
 	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, Duration, FColor::Red, TEXT("Stun Triggered"));
 

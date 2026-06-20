@@ -47,6 +47,6 @@ public:
 
 	bool bGameOver = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, Category = "Player Setup")
     UMaterialInterface* Player1Mat;
 };
