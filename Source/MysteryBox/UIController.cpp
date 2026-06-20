@@ -84,7 +84,9 @@ void AUIController::Player1UI()
     ImGui::SetWindowFontScale(1.2f);
     float headerWidth = ImGui::CalcTextSize(headerText).x;
     ImGui::SetCursorPosX((windowWidth - headerWidth) * 0.5f);
-    ImGui::Text("%s", headerText);
+    ImGui::Text("PLAYER ");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(0.15f, 0.56f, 1.f, 1.0f), "1");
 
     // Score display (Big, prominent gold text)
     ImGui::SetWindowFontScale(2.0f);
@@ -92,6 +94,7 @@ void AUIController::Player1UI()
     ImGui::SetCursorPosX((windowWidth - scoreWidth) * 0.5f);
     ImGui::TextColored(ImVec4(0.9f, 0.75f, 0.4f, 1.0f), "%s", buffer);
 
+    ImGui::PopFont();
     if (P1StunTime > 0.f)
     {
         float stunProgress = P1StunTime / 2.f;
@@ -103,6 +106,7 @@ void AUIController::Player1UI()
         ImGui::ProgressBar(stunProgress, ImVec2(-1.0f, 0.0f), "");
         ImGui::PopStyleColor(1);
     }
+
 
     if (P1SpeedTime > 0.f)
     {
@@ -120,7 +124,6 @@ void AUIController::Player1UI()
     ImGui::End();
 
     ImGui::PopStyleColor(2);
-    ImGui::PopFont();
 }
 
 void AUIController::Player2UI()
@@ -134,7 +137,7 @@ void AUIController::Player2UI()
     ImVec2 center = ImVec2(io.DisplaySize.x * 0.95f, io.DisplaySize.y * 0.05f);
 
     ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(1.0f, 0.0f));
-    ImGui::SetNextWindowSize(ImVec2(200.0f, 90.0f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(200.0f, 180.0f), ImGuiCond_Always);
 
     ImGuiWindowFlags flags =
         ImGuiWindowFlags_NoResize |
@@ -156,19 +159,25 @@ void AUIController::Player2UI()
     ImGui::SetWindowFontScale(1.2f);
     float headerWidth = ImGui::CalcTextSize(headerText).x;
     ImGui::SetCursorPosX((windowWidth - headerWidth) * 0.5f);
-    ImGui::Text("%s", headerText);
-
+    ImGui::Text("PLAYER ");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.f, 0.37f, 0.f, 1.0f), "2");
+    
     // Score display (Big, prominent gold text)
     ImGui::SetWindowFontScale(2.0f);
     float scoreWidth = ImGui::CalcTextSize(buffer).x;
     ImGui::SetCursorPosX((windowWidth - scoreWidth) * 0.5f);
     ImGui::TextColored(ImVec4(0.9f, 0.75f, 0.4f, 1.0f), "%s", buffer);
 
+    ImGui::PopFont();
     if (P2StunTime > 0.f)
     {
         float stunProgress = P2StunTime / 2.f;
 
-        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.1f, 0.8f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.85f, 0.15f, 0.15f, 1.0f));
+
+        ImGui::TextColored(ImVec4(0.85f, 0.15f, 0.15f, 1.0f), "!");
+        ImGui::SameLine();
         ImGui::ProgressBar(stunProgress, ImVec2(-1.0f, 0.0f), "");
         ImGui::PopStyleColor(1);
     }
@@ -177,15 +186,18 @@ void AUIController::Player2UI()
     {
         float speedProgress = P2SpeedTime / 3.f;
 
-        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.1f, 0.8f, 0.3f, 1.0f));
-        ImGui::ProgressBar(speedProgress, ImVec2(-1.0f, 0.0f), ">>");
+        ImVec4 speedColor = P2SpeedUp ? ImVec4(0.1f, 0.6f, 1.0f, 1.0f) : ImVec4(0.5f, 0.2f, 0.8f, 1.0f);
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, speedColor);
+
+        ImGui::TextColored(speedColor, P2SpeedUp ? ">>" : "<<");
+        ImGui::SameLine();
+        ImGui::ProgressBar(speedProgress, ImVec2(-1.0f, 0.0f), "");
         ImGui::PopStyleColor(1);
     }
 
     ImGui::End();
 
     ImGui::PopStyleColor(2);
-    ImGui::PopFont();
 }
 
 void AUIController::WinningUI()
@@ -247,19 +259,19 @@ void AUIController::CallWinScreen(int32 playerId)
 
 void AUIController::StunPlayerUI(int32 playerId)
 {
-    playerId != 1 ? P2StunTime = 2.f : P1StunTime = 2.f;
+    playerId == 1 ? P2StunTime = 2.f : P1StunTime = 2.f;
 }
 
 void AUIController::SpeedBuffUI(int32 playerId, bool bonus)
 {
-    if (playerId != 1)
+    if (playerId == 1)
     {
-        P2StunTime = 3.f;
+        P2SpeedTime = 3.f;
         P2SpeedUp = bonus;
     }
     else
     {
-        P1StunTime = 3.f;
+        P1SpeedTime = 3.f;
         P1SpeedUp = bonus;
     }
 }

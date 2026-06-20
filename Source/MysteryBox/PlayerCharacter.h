@@ -9,6 +9,7 @@
 
 class UInputMappingContext;
 class UInputAction;
+class AUIController;
 
 enum class EBoxColor : uint8;
 
@@ -52,6 +53,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Game Status")
 	float BaseSpeed;
 
+	int32 playerSide = 0;
+
 	// Effects applied by boxes
 	void ApplySpeedModifier(float Multiplier, float Duration);
 	void ApplyStun(float Duration);
@@ -87,6 +90,8 @@ private:
 	// Timer Handles for resetting effects
 	FTimerHandle SpeedTimerHandle;
 	FTimerHandle StunTimerHandle;
+
+	AUIController* UIController;
 
 	void ResetSpeed();
 	void ResetStun();

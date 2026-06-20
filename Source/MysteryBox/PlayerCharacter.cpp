@@ -12,6 +12,8 @@
 #include "TimerManager.h"
 #include "MysteryBoxActor.h"
 #include "MysteryBoxGameMode.h"
+#include "UIController.h"
+#include "utils/PUtils.h"
 
 
 APlayerCharacter::APlayerCharacter()
@@ -162,6 +164,10 @@ void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
 	int32 BoxRoll = FMath::RandRange(1, 100);
 	FString PresentColor = "";
 
+	if(UIController == nullptr){
+		UIController = Cast<AUIController>(PUTILS::GetFirstActorByTag("UI_CONTROLLER",this->GetWorld()));
+	}
+
 	if (BoxColor == EBoxColor::Green)
 	{
 		if (BoxRoll <= 70) PresentColor = "Green";
@@ -210,6 +216,7 @@ void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
 		{
 			// 40% Chance: Speed Up
 			ApplySpeedModifier(1.5f, 3.0f); // 50% faster, 3 seconds
+			UIController->SpeedBuffUI(playerSide, true);
 			PlayDelayedSound(SpeedUpSound);
 			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Speed Up for 3 Seconds!"));
 		}
@@ -217,6 +224,7 @@ void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
 		{
 			// 40% Chance: Enemy Stun
 			if (GM) GM->StunEnemy(this, 2.0f);
+			UIController->StunPlayerUI(playerSide == 0 ? 1 : 0);
 			PlayDelayedSound(StunSound);
 			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("RESULT: Stunned the Enemy for 2 Seconds!"));
 		}
@@ -235,6 +243,7 @@ void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
 		{
 			// 40% Chance: Speed Down
 			ApplySpeedModifier(0.5f, 3.0f); // 50% slower, 3 seconds
+			UIController->SpeedBuffUI(playerSide, false);
 			PlayDelayedSound(SpeedDownSound);
 			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Speed Down for 3 Seconds!"));
 		}
@@ -242,6 +251,7 @@ void APlayerCharacter::ProcessMysteryBox(EBoxColor BoxColor)
 		{
 			// 40% Chance: Self Stun
 			ApplyStun(2.0f);
+			UIController->StunPlayerUI(playerSide);
 			PlayDelayedSound(StunSound);
 			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RESULT: Self Stun for 2 Seconds!"));
 		}

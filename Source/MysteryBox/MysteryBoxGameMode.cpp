@@ -17,6 +17,7 @@ void AMysteryBoxGameMode::BeginPlay()
 	if (P2Controller && Player2Mat) {
 		if (APlayerCharacter* P2Character = Cast<APlayerCharacter>(P2Controller->GetPawn())) {
 			P2Character->SetModelMaterial(Player2Mat);
+			P2Character->playerSide = 1;
 		}
 	}
 

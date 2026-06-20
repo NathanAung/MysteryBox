@@ -76,12 +76,9 @@ void ATitleController::ShowTitleMenu()
 
 	// --- STYLING: The "Mystery Box" Palette ---
 	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.95f, 0.95f, 0.95f, 1.0f));
-	// Deep mysterious purple for buttons
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.15f, 0.35f, 0.8f));
-	// Bright neon violet glow on hover
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.45f, 0.25f, 0.65f, 1.0f));
-	// Darker tone when clicked
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.05f, 0.25f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.05f, 0.15f, 0.35f, 0.8f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.15f, 0.35f, 0.65f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.02f, 0.08f, 0.20f, 1.0f));
 
 	ImGui::PushFont(CustomFont);
 
@@ -102,7 +99,7 @@ void ATitleController::ShowTitleMenu()
 
 	ImGui::SetCursorPosX((windowWidth - titleWidth) * 0.5f);
 	// Colored text for the title (a soft, mysterious gold/yellow)
-	ImGui::TextColored(ImVec4(0.9f, 0.75f, 0.4f, 1.0f), "%s", titleText.c_str());
+	ImGui::TextColored(ImVec4(0.9f, 0.9f, 0.9f, 1.0f), "%s", titleText.c_str());
 
 	// Reset font scale down for the buttons
 	ImGui::SetWindowFontScale(1.2f);
