@@ -11,9 +11,21 @@ void AMysteryBoxGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Setup Player 1 material
+	if (Player1Mat)
+	{
+		if (APlayerController* P1Controller = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+		{
+			if (APlayerCharacter* P1Character = Cast<APlayerCharacter>(P1Controller->GetPawn()))
+			{
+				P1Character->SetModelMaterial(Player1Mat);
+			}
+		}
+	}
+
 	// Spawn Player 2
 	APlayerController* P2Controller = UGameplayStatics::CreatePlayer(GetWorld(), 1, true);
-
+	
 	if (P2Controller && Player2Mat) {
 		if (APlayerCharacter* P2Character = Cast<APlayerCharacter>(P2Controller->GetPawn())) {
 			P2Character->SetModelMaterial(Player2Mat);

@@ -276,7 +276,9 @@ void APlayerCharacter::ApplyStun(float Duration)
 {
 	// This completely disables the Move() and Interact() functions
 	bIsStunned = true;
-
+	//CurrentPlayerMaterial = GetMesh()->GetMaterial(0);
+	//SetModelMaterial(StunnedMaterial);
+	ApplyVisualMaterial(StunnedMaterial);
 	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, Duration, FColor::Red, TEXT("Stun Triggered"));
 
 	// Safely manage the timer
@@ -288,6 +290,7 @@ void APlayerCharacter::ApplyStun(float Duration)
 void APlayerCharacter::ResetStun()
 {
 	bIsStunned = false;
+	ApplyVisualMaterial(CurrentPlayerMaterial);
 	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Stun Ended"));
 }
 
@@ -295,6 +298,7 @@ void APlayerCharacter::ResetStun()
 void APlayerCharacter::DisablePlayer()
 {
 	bIsStunned = true;
+
 
 	// Clear timers so a previously running buff/debuff doesn't accidentally reset the stun
 	GetWorldTimerManager().ClearTimer(SpeedTimerHandle);
@@ -306,6 +310,16 @@ void APlayerCharacter::DisablePlayer()
 
 
 void APlayerCharacter::SetModelMaterial(UMaterialInterface* NewMaterial)
+{
+	if (!NewMaterial) return;
+
+	CurrentPlayerMaterial = NewMaterial;
+	ApplyVisualMaterial(NewMaterial);
+
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Could not find a component named 'boxmover'"));
+}
+
+void APlayerCharacter::ApplyVisualMaterial(UMaterialInterface* NewMaterial)
 {
 	if (!NewMaterial) return;
 

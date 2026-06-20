@@ -62,6 +62,13 @@ public:
 	// Finds the custom "Model" component and changes its material
 	void SetModelMaterial(class UMaterialInterface* NewMaterial);
 
+	void ApplyVisualMaterial(class UMaterialInterface* NewMaterial);
+
+	UPROPERTY()
+	UMaterialInterface* CurrentPlayerMaterial;
+	UPROPERTY(EditAnywhere, Category="Materials")
+	UMaterialInterface* StunnedMaterial;
+
 	UPROPERTY(EditAnywhere, Category="Audio")
 	USoundBase* BoxOpenSound;
 
@@ -82,6 +89,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
 	float EffectSoundDelay = 0.4f;
+
+
 
 private:
 	// Timer Handles for resetting effects
