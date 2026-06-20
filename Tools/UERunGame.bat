@@ -28,4 +28,4 @@ for %%a in (%projExt%) do set projName=%%a
 popd
 
 
-%unreal% "%~dp0..\%projName%" -ExecCmds="Scalability 3" -log -game -windowed -resx=1280 -resy=720
+%unreal% "%~dp0..\%projName%" -ExecCmds="Scalability 5" -log -game -windowed -resx=1280 -resy=720
